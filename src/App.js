@@ -1,33 +1,15 @@
-import { useEffect, useState } from "react";
-
 import axios from "axios";
 import { BookCreate } from "./components/BookCreate";
 import { BookList } from "./components/BookList";
+import { useFetch } from "./hooks/useFetch";
 
 function App() {
-  const [books, setBooks] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState();
-
-  const fetchBooks = async () => {
-    setIsLoading(true);
-
-    try {
-      const response = await axios.get("http://localhost:3001/books");
-      console.log(response);
-      if (response.status !== 200) {
-        throw new Error("Failed to fetch books");
-      }
-      setBooks(response.data);
-    } catch (error) {
-      setError(error);
-    }
-    setIsLoading(false);
-  };
-
-  useEffect(() => {
-    fetchBooks();
-  }, []);
+  const {
+    data: books,
+    isLoading,
+    error,
+    setData: setBooks,
+  } = useFetch("http://localhost:3001/books", []);
 
   const editBookById = async (id, newTitle) => {
     const response = await axios.put("http://localhost:3001/books/" + id, {
