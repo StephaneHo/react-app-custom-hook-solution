@@ -2,14 +2,27 @@ import { useEffect, useState } from "react";
 
 import axios from "axios";
 import { BookCreate } from "./components/BookCreate";
-import BookList from "./components/BookList";
+import { BookList } from "./components/BookList";
 
 function App() {
   const [books, setBooks] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState();
 
   const fetchBooks = async () => {
-    const response = await axios.get("http://localhost:3001/books");
-    setBooks(response.data);
+    setIsLoading(true);
+
+    try {
+      const response = await axios.get("http://localhost:3001/books");
+      console.log(response);
+      if (response.status !== 200) {
+        throw new Error("Failed to fetch books");
+      }
+      setBooks(response.data);
+    } catch (error) {
+      setError(error);
+    }
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -51,7 +64,13 @@ function App() {
   return (
     <div className="mx-20">
       <h1 className="text-3xl font-bold underline mx-20 my-20">Reading List</h1>
-      <BookList onEdit={editBookById} books={books} onDelete={deleteBookById} />
+      <BookList
+        onEdit={editBookById}
+        books={books}
+        onDelete={deleteBookById}
+        isLoading={isLoading}
+        error={error}
+      />
       <BookCreate onCreate={createBook} />
     </div>
   );
